@@ -1,4 +1,18 @@
 <?php
+function initDB()
+{
+    // Kết nối CSDL
+    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '1');
+    return $paPDO;
+}
+// initDB();
+ $mySQLStr = "SELECT ST_AsGeoJson(geom), name from travel_location_2";
+ //echo $mySQLStr;
+ //echo "<br><br>";
+ $result = query(initDB(), $mySQLStr);
+
+//  echo '<pre>' , var_dump($result) , '</pre>';
+// die();
     if(isset($_POST['functionname']))
     {
         $paPDO = initDB();
@@ -12,17 +26,13 @@
         else if ($functionname == 'getInfoCMRToAjax')
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         
-        echo $aResult;
+        
+        return ($aResult);
     
         closeDB($paPDO);
     }
 
-    function initDB()
-    {
-        // Kết nối CSDL
-        $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '1');
-        return $paPDO;
-    }
+    
     function query($paPDO, $paSQLStr)
     {
         try
@@ -151,14 +161,23 @@
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
         //echo $mySQLStr;
         //echo "<br><br>";
-        $result = query($paPDO, $mySQLStr);
+        $points = "SELECT ST_AsGeoJson(travel_location_2.geom) as geo, travel_location_2.name 
+        from \"gadm40_vnm_1\", \"travel_location_2\" 
+        where ST_within(travel_location_2.geom, gadm40_vnm_1.geom)=true 
+        and
+        ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,gadm40_vnm_1.geom)";
+        $result = query($paPDO, $points);
+      
         
         if ($result != null)
         {
             // Lặp kết quả
-            foreach ($result as $item){
-                return $item['geo'];
-            }
+            // foreach ($result as $item){
+            //     return $item['geo'];
+            // }
+        //     echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
+        // die();
+            return ($result);
         }
         else
             return "null";
