@@ -2,7 +2,7 @@
 
 //connect to the database
 //$dbConn = pg_connect("host=<host> port=<port> dbname=<db_name> user=<db_user> password=<db_pass>");
-$conn = pg_connect('host=localhost port=5432 dbname=btl_gis user=postgres password=2525');
+$conn = pg_connect('host=localhost port=5432 dbname=btl_gis user=postgres password=1');
 // check connection
 if (!$conn) {
 	echo 'Connection error: ' . mysqli_connect_error();
