@@ -60,12 +60,11 @@ if (!$_SESSION['email']) {
                     source: new ol.source.OSM({})
                 });
                 //*/
-                let map_name = 'gadm40_vnm_1';
+                let map_name = 'travel_location';
                 $('.change-map').click(function(){
                     map_name =  ($(this).attr('id'));
                     alert(map_name);
                 })
-                console.log(map_name);
                 var layerCMR_adm1 = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
                         ratio: 1,
@@ -78,6 +77,7 @@ if (!$_SESSION['email']) {
                         }
                     })
                 });
+                console.log(layerCMR_adm1)
                 var viewMap = new ol.View({
                     center: ol.proj.fromLonLat([mapLng, mapLat]),
                     zoom: mapDefaultZoom
@@ -193,4 +193,4 @@ if (!$_SESSION['email']) {
 <?php include('templates/footer.php'); ?>
 
 
-</html>
+</html> 
