@@ -65,7 +65,7 @@
             <div class="auth ">
               <div class="btn-group">
                 <div class="dropdown-toggle d-flex" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer">
-                  <img src="<?php echo $_SESSION['avatar']; ?>" id="avatar" class="avt img-thumbnail m-auto" alt="...">
+                  <img src="<?php echo $_SESSION['user_image']; ?>" id="avatar" class="avt img-thumbnail m-auto" alt="...">
                   <p class="my-auto mx-2"><b><?php echo $_SESSION['name']; ?></b></p>
                 </div>
                 <ul class="dropdown-menu">

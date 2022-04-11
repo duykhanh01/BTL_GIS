@@ -128,7 +128,6 @@ if (!$_SESSION['email']) {
       }
       function setSourceMap()
       {
-        vectorSource.clear();
         console.log(vectorSource);
         vectorSource = new ol.source.Vector({
             features
@@ -277,7 +276,6 @@ if (!$_SESSION['email']) {
                 
                         success : function (result, status, erro) {
 							points =(result);
-                            vectorSource.clear();
                             setFeatures(points);
 
                             highLightObj(points[0]['geo_gadm']);

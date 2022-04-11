@@ -29,7 +29,7 @@ if (isset($_POST['submit-reg'])) {
             $errors['all'] = 'Email đã tồn tại';
         } else {
             $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO users (full_name, email, password, avatar) VALUES ('$full_name', '$email', '$pass_hash','images/avatar/default.png')";
+            $sql = "INSERT INTO users (full_name, email, password, avatar) VALUES ('$full_name', '$email', '$pass_hash','assets/images/avatar/default.png')";
             $result = pg_query($conn, $sql);
 
             if ($result) {
