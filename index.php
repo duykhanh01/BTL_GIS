@@ -48,7 +48,7 @@ if (!$_SESSION['email']) {
         <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
         </div>
         <!-- Position it -->
-        <div style="position: absolute; top: 0; right: 0;">      
+        <div class ="toast-wrapper d-none" style="position: absolute; top: 0; right: 0;">      
             <!-- Then put toasts within -->
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -330,10 +330,12 @@ if (!$_SESSION['email']) {
                         data: {functionname: 'checkIn', 'location_id': location_id, 'user_id': user_id},
                         success : function (result, status, erro) {
                             if(result=="error"){
+                                $('.toast-wrapper').removeClass('d-none')
                                 $('.toast-body').html("Bạn đã check in ở đây rồi!");
                                 $('.toast').toast('show');
                                 $('.btn-checkin').attr('disabled','disabled');
                             } else{
+                                $('.toast-wrapper').removeClass('d-none')
                                 $('.btn-checkin').removeAttr("disabled")
                                 $('.checkIn').html(result);
                                 $('.toast').toast('show')
