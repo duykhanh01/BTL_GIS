@@ -1,4 +1,5 @@
 <?php
+
 function initDB()
 {
     // Kết nối CSDL
@@ -27,7 +28,7 @@ function initDB()
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         
         
-        return ($aResult);
+            echo ($aResult);
     
         closeDB($paPDO);
     }
@@ -161,7 +162,7 @@ function initDB()
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
         //echo $mySQLStr;
         //echo "<br><br>";
-        $points = "SELECT ST_AsGeoJson(travel_location_2.geom) as geo, travel_location_2.name 
+        $points = "SELECT ST_AsGeoJson(travel_location_2.geom) as geo
         from \"gadm40_vnm_1\", \"travel_location_2\" 
         where ST_within(travel_location_2.geom, gadm40_vnm_1.geom)=true 
         and
@@ -172,12 +173,12 @@ function initDB()
         if ($result != null)
         {
             // Lặp kết quả
-            // foreach ($result as $item){
-            //     return $item['geo'];
-            // }
+            foreach ($result as $item){
+                echo $item['geo'];
+            }
         //     echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
         // die();
-            return ($result);
+           // return (($result));
         }
         else
             return "null";
@@ -212,4 +213,3 @@ function initDB()
         else
             return "null";
     }
-?>

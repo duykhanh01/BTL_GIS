@@ -74,14 +74,16 @@ if (!$_SESSION['email']) {
         return Math.random() * ref + min;
       }
       const features = [];
-      for (i = 0; i < 300; i++) {
+      for (i = 0; i < 10; i++) {
         features.push(new ol.Feature({
           geometry: new ol.geom.Point(ol.proj.fromLonLat([
             -getRandomNumber(50, 50), getRandomNumber(10, 50)
           ]))
+          
         }));
+        console.log(-getRandomNumber(50, 50));
       }
-
+      console.log(features);
       // create the source and layer for random features
       const vectorSource = new ol.source.Vector({
         features
@@ -219,13 +221,13 @@ if (!$_SESSION['email']) {
                         //dataType: 'json',
                         data: {functionname: 'getGeoCMRToAjax', paPoint: myPoint},
                         success : function (result, status, erro) {
-							points =(result);
-							alert(points);
+							
+							console.log((result));
 							// for(i=0 ; i<points.length; i++)
 							// {
 							// 	console.log(points[i]);
 							// }
-                          //  highLightObj(result);
+                          highLightObj(result);
                         },
                         error: function (req, status, error) {
                             alert(req + " " + status + " " + error);
