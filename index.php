@@ -110,7 +110,7 @@ if (!$_SESSION['email']) {
       }
       function setSourceMap()
       {
-        
+        vectorSource.refresh();
         vectorSource = new ol.source.Vector({
             features
         });
@@ -316,8 +316,9 @@ if (!$_SESSION['email']) {
                        
                     });
                 })
-                $('.btn-search').click(function(){
+                $('.btn-search').click(function(e){
                     let keyword = $('#search-location').val();
+                    e.preventDefault;
                     alert(keyword);
                     $.ajax({
                         type: "POST",
@@ -329,7 +330,9 @@ if (!$_SESSION['email']) {
                             setFeatures(result);
                             highLightObj((result[0]['geo_gadm']));
                         },
-
+                        error: function (req, status, error) {
+                            console.log(req + " " + status + " " + error);
+                        }
                        
                     });
                 })
