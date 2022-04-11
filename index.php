@@ -18,7 +18,7 @@ if (!$_SESSION['email']) {
 <?php include('templates/header.php'); ?>
 
 
-    <div class="d-flex w-100 mt-3">
+    <div class="d-flex w-100 mt-3" style="position: relative;">
     
         <div id="map" onclick="popup();" style="width: 70%; height: 100vh;"></div>
         
@@ -44,6 +44,22 @@ if (!$_SESSION['email']) {
                             </div>
                         </div>
                     </div>
+        </div>
+        <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+        </div>
+        <!-- Position it -->
+        <div class ="toast-wrapper d-none" style="position: absolute; top: 0; right: 0;">      
+            <!-- Then put toasts within -->
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              
+            </div>
+            </div>
+        </div>
         <?php include 'CMR_pgsqlAPI.php' ?>
         
         <?php
@@ -95,8 +111,8 @@ if (!$_SESSION['email']) {
     //             105.61516,21.39584
     //         ]))
     //         }));
-      function setFeatures(points)
-      {
+    function setFeatures(points)
+    {
        
         for (i = 0; i < points.length; i++) {
             features.push(new ol.Feature({
@@ -106,7 +122,9 @@ if (!$_SESSION['email']) {
             }));
            //console.log(JSON.parse(points[i]['geo']).coordinates[0]);
         }
+        
         setSourceMap();
+
       }
       function setSourceMap()
       {
@@ -258,7 +276,9 @@ if (!$_SESSION['email']) {
                 
                         success : function (result, status, erro) {
 							points =(result);
+                            vectorSource.clear();
                             setFeatures(points);
+
                             highLightObj(points[0]['geo_gadm']);
                            
                         },
@@ -308,11 +328,22 @@ if (!$_SESSION['email']) {
                         url: "CMR_pgsqlAPI.php",
                         data: {functionname: 'checkIn', 'location_id': location_id, 'user_id': user_id},
                         success : function (result, status, erro) {
-                            $('.checkIn').html(result);
-
-                            alert("Bạn đã check in thành công");
+                            if(result=="error"){
+                                $('.toast-wrapper').removeClass('d-none')
+                                $('.toast-body').html("Bạn đã check in ở đây rồi!");
+                                $('.toast').toast('show');
+                                $('.btn-checkin').attr('disabled','disabled');
+                            } else{
+                                $('.toast-wrapper').removeClass('d-none')
+                                $('.btn-checkin').removeAttr("disabled")
+                                $('.checkIn').html(result);
+                                $('.toast').toast('show')
+                                $('.toast-body').html("Bạn đã check in thành công");
+                            }
                         },
-
+                        errors : function (result, status, erro) {
+                            alert("Loi");
+                        }
                        
                     });
                 })
