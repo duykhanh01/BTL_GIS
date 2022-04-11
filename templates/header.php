@@ -52,9 +52,14 @@
                 <li class="nav-item">
                   <a class="nav-link" href="manager.php">Manager Users</a>
                 </li>
-
+                <li class="nav-link">
+                
+                </li>
           </ul>
-
+          <form class="d-flex" style="margin-right:15px;">
+                <input id="search-location" class="form-control me-2"  placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success btn-search">Search</button>
+          </form>
 
           <?php if (isset($_SESSION['email'])) : ?>
             <div class="auth ">

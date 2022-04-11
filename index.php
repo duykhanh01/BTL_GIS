@@ -18,16 +18,13 @@ if (!$_SESSION['email']) {
 <?php include('templates/header.php'); ?>
 
 
-<table>
-            <tr>
-                <td>
-                    <div id="map" onclick="popup();" style="width: 80vw; height: 100vh;"></div>
-                </td>
-                <td>
-                    <button>Button</button>
-                </td>
-            </tr>
-        </table>
+    <div class="d-flex w-100 mt-3">
+    
+        <div id="map" onclick="popup();" style="width: 70%; height: 100vh;"></div>
+        
+      
+    </div>
+   
         <div class=" modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-sm">
                             <div class="modal-content">
@@ -39,10 +36,10 @@ if (!$_SESSION['email']) {
                                    <div class="content">
 
                                    </div>
-                                   <button type="button" class="btn btn-primary">Check in</button>
+                                   <button type="button" class="btn btn-info mt-3 btn-checkin">Check in</button>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
@@ -100,6 +97,7 @@ if (!$_SESSION['email']) {
     //         }));
       function setFeatures(points)
       {
+       
         for (i = 0; i < points.length; i++) {
             features.push(new ol.Feature({
             geometry: new ol.geom.Point(ol.proj.fromLonLat([
@@ -112,6 +110,7 @@ if (!$_SESSION['email']) {
       }
       function setSourceMap()
       {
+        
         vectorSource = new ol.source.Vector({
             features
         });
@@ -259,24 +258,12 @@ if (!$_SESSION['email']) {
                 
                         success : function (result, status, erro) {
 							points =(result);
-                        
-							
-                            // const features = [];
-                            // for (i = 0; i < 300; i++) {
-                            //     features.push(new ol.Feature({
-                            //     geometry: new ol.geom.Point(ol.proj.fromLonLat([
-                            //         -getRandomNumber(50, 50), getRandomNumber(10, 50)
-                            //     ]))
-                            //     }));
-                            // }
                             setFeatures(points);
                             highLightObj(points[0]['geo_gadm']);
+                           
                         },
-                        // error: function (req, status, error) {
-                        //    // alert(req + " " + status + " " + error);
-                        // }
+                       
                     });
-                    //*/
                 });
                 map.on('click', function (evt) {
                     //alert("coordinate: " + evt.coordinate);
@@ -313,6 +300,39 @@ if (!$_SESSION['email']) {
                     });
                     //*/
                 });
+                $('.btn-checkin').click(function(){
+                    let location_id = $('#location_id').val();
+                    let user_id = <?php echo $_SESSION['id'] ?>;
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                        data: {functionname: 'checkIn', 'location_id': location_id, 'user_id': user_id},
+                        success : function (result, status, erro) {
+                            $('.checkIn').html(result);
+
+                            alert("Bạn đã check in thành công");
+                        },
+
+                       
+                    });
+                })
+                $('.btn-search').click(function(){
+                    let keyword = $('#search-location').val();
+                    alert(keyword);
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                        dataType: 'json',
+                        data: {functionname: 'search', 'keyword': keyword},
+                        success : function (result, status, erro) {
+                            console.log(result);
+                            setFeatures(result);
+                            highLightObj((result[0]['geo_gadm']));
+                        },
+
+                       
+                    });
+                })
             };
         </script>
 

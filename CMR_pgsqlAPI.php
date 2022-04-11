@@ -17,7 +17,7 @@ function initDB()
     {
         $paPDO = initDB();
         $paSRID = '4326';
-        $paPoint = $_POST['paPoint'];
+        $paPoint = $_POST['paPoint'] ?? null;
         $functionname = $_POST['functionname'];
         
         $aResult = "null";
@@ -27,10 +27,28 @@ function initDB()
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         else if($functionname == 'getInfoLocation')
             $aResult = getInfoLocation($paPDO,$paSRID,$paPoint);
-        
+        else if($functionname == 'checkIn')
+            $aResult = checkIn($paPDO);
+        else if($functionname == 'search')
+            $aResult = search($paPDO);
         return ($aResult);
     
        // closeDB($paPDO);
+    }
+
+    function search($paPDO)
+    {
+        $keyword = $_POST['keyword'];
+        $query = "SELECT ST_AsGeoJson(travel_location.geom) as geo, ST_AsGeoJson(gadm40_vnm_1.geom) as geo_gadm
+        from \"gadm40_vnm_1\", \"travel_location\" 
+        where ST_within(travel_location.geom, gadm40_vnm_1.geom)=true 
+        and gadm40_vnm_1.name_1 = '$keyword'
+        ";
+       
+      //  $query = "SELECT ST_AsGeoJson(geom) as geo from gadm40_vnm_1 where name_1 = '$keyword'";
+        $result = query($paPDO, $query);
+        echo json_encode($result);
+       
     }
 
     function getInfoLocation($paPDO,$paSRID,$paPoint)
@@ -62,18 +80,22 @@ function initDB()
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
         //echo $mySQLStr;
         //echo "<br><br>";
-        $points = "SELECT  travel_location.name  
+        $points = "SELECT  travel_location.name, travel_location.id
         from  \"travel_location\" 
         where ST_Distance('SRID=4326;$paPoint', travel_location.geom) <= all(select ST_Distance('SRID=4326;$paPoint', travel_location.geom) from \"travel_location\") 
         and ST_Distance('SRID=4326;$paPoint', travel_location.geom) < 0.05";
         $result = query($paPDO, $points);
-        
         if ($result != null)
         {
+            $location_id = $result[0]['id'];
+            $query = "Select count(*) as count from \"check_in\" where travel_id = '$location_id'";
+            $result1 =  query($paPDO, $query );
+            $countCheckIn = $result1[0]['count'] ?? 0;
             $resFin = '<table>';
             // Lặp kết quả
-        
+            $resFin = $resFin."<input type='hidden' id='location_id' value='$location_id'>";
             $resFin = $resFin.'<tr><td>Tên địa điểm: '.$result[0]['name'].'</td></tr>';
+            $resFin = $resFin.'<tr><td class="checkIn">Số người check in tại đây: '.$countCheckIn.'</td></tr>';
             $resFin = $resFin.'</table>';
     
             echo $resFin;
@@ -261,4 +283,19 @@ function initDB()
         else
             return "null";
     }
+
+
+    function checkIn($paPDO)
+    {
+        $location_id = $_POST['location_id'] ?? null;
+        $user_id = $_POST['user_id'] ?? null;
+        $mySQLStr = "Insert into check_in (user_id, travel_id) values('$user_id', '$location_id')";
+        $result = query($paPDO, $mySQLStr);
+        $query = "Select count(*) as count from check_in where travel_id = $location_id";
+        $result1 = query($paPDO, $query);
+        $count = $result1[0]['count'];
+        $html = "Số người đã check in tại đây: $count";
+        echo $html;
+     }
+
 ?>
