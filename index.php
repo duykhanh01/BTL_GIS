@@ -55,15 +55,76 @@ if (!$_SESSION['email']) {
             var mapLng = cenX;
             var mapDefaultZoom = 6;
             function initialize_map() {
+				// thêm
+
+		// const features = [];		
+		// function creatPoint(points)
+		// {
+			
+		// 	for (i = 0; i < length(points); i++) {
+		// 		features.push(new ol.Feature({
+		// 			geometry: new ol.geom.Point(ol.proj.fromLonLat([
+		// 				points.x	, points.y
+		// 		]))
+		// 		}));
+      	// 	}
+		// }		
+      
+		const getRandomNumber = function (min, ref) {
+        return Math.random() * ref + min;
+      }
+      const features = [];
+    //   features.push(new ol.Feature({
+    //         geometry: new ol.geom.Point(ol.proj.fromLonLat([
+    //             105.61516,21.39584
+    //         ]))
+    //         }));
+      function setFeatures(points)
+      {
+        for (i = 0; i < points.length; i++) {
+            features.push(new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([
+                JSON.parse(points[i]['geo']).coordinates[0]  ,  JSON.parse(points[i]['geo']).coordinates[1]
+            ]))
+            }));
+           //console.log(JSON.parse(points[i]['geo']).coordinates[0]);
+        }
+        setSourceMap();
+      }
+      function setSourceMap()
+      {
+        vectorSource = new ol.source.Vector({
+            features
+        });
+        vectorLayer_1.setSource(vectorSource);
+       
+      }
+      
+     
+      // create the source and layer for random features
+      let vectorSource = new ol.source.Vector({
+        features
+      });
+  
+      let vectorLayer_1 = new ol.layer.Vector({
+        source: vectorSource,
+        style: new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({color: 'red'})
+          })
+        })
+      });
+
+				// end thêm
                 //*
                 layerBG = new ol.layer.Tile({
                     source: new ol.source.OSM({})
                 });
                 //*/
-                let map_name = 'travel_location';
+                let map_name = 'travel_location_2';
                 $('.change-map').click(function(){
                     map_name =  ($(this).attr('id'));
-                    alert(map_name);
                 })
                 var layerCMR_adm1 = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
@@ -77,15 +138,16 @@ if (!$_SESSION['email']) {
                         }
                     })
                 });
-                console.log(layerCMR_adm1)
+
                 var viewMap = new ol.View({
                     center: ol.proj.fromLonLat([mapLng, mapLat]),
                     zoom: mapDefaultZoom
                     //projection: projection
                 });
+           
                 map = new ol.Map({
                     target: "map",
-                    layers: [layerBG, layerCMR_adm1],
+                    layers: [layerBG, vectorLayer_1],
                     //layers: [layerCMR_adm1],
                     view: viewMap
                 });
@@ -93,12 +155,10 @@ if (!$_SESSION['email']) {
                 
                 var styles = {
                     'MultiPolygon': new ol.style.Style({
-                        fill: new ol.style.Fill({
-                            color: 'orange'
-                        }),
+                        
                         stroke: new ol.style.Stroke({
-                            color: 'yellow', 
-                            width: 2
+                            color: 'green', 
+                            width: 3
                         })
                     })
                 };
@@ -175,17 +235,56 @@ if (!$_SESSION['email']) {
                     $.ajax({
                         type: "POST",
                         url: "CMR_pgsqlAPI.php",
-                        //dataType: 'json',
+                        dataType: 'json',
                         data: {functionname: 'getGeoCMRToAjax', paPoint: myPoint},
+                
                         success : function (result, status, erro) {
-                            highLightObj(result);
+							points =(result);
+                        
+							
+                            // const features = [];
+                            // for (i = 0; i < 300; i++) {
+                            //     features.push(new ol.Feature({
+                            //     geometry: new ol.geom.Point(ol.proj.fromLonLat([
+                            //         -getRandomNumber(50, 50), getRandomNumber(10, 50)
+                            //     ]))
+                            //     }));
+                            // }
+                            setFeatures(points);
+                            highLightObj(points[0]['geo_gadm']);
                         },
-                        error: function (req, status, error) {
-                            alert(req + " " + status + " " + error);
-                        }
+                        // error: function (req, status, error) {
+                        //    // alert(req + " " + status + " " + error);
+                        // }
                     });
                     //*/
                 });
+                // map.on('click', function (evt) {
+                //     //alert("coordinate: " + evt.coordinate);
+                //     //var myPoint = 'POINT(12,5)';
+                //     var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                //     var lon = lonlat[0];
+                //     var lat = lonlat[1];
+                //     var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                    
+                //   //  alert("myPoint: " + myPoint);
+                //     //*
+                //     $.ajax({
+                //         type: "POST",
+                //         url: "CMR_pgsqlAPI.php",
+                //         dataType: 'json',
+                //         data: {functionname: 'getInfoLocation', paPoint: myPoint},
+                
+                //         success : function (result, status, erro) {
+				// 		//	alert(result);
+                //             console.log(1);
+                //         },
+                //         error: function (req, status, error) {
+                //           //  alert(req + " " + status + " " + error);
+                //         }
+                //     });
+                //     //*/
+                // });
             };
         </script>
 
@@ -193,4 +292,4 @@ if (!$_SESSION['email']) {
 <?php include('templates/footer.php'); ?>
 
 
-</html> 
+</html>
