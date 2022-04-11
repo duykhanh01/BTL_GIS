@@ -58,7 +58,7 @@
           </ul>
           <form class="d-flex" style="margin-right:15px;">
                 <input id="search-location" class="form-control me-2"  placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success btn-search">Search</button>
+                <a href="#" class="btn btn-outline-success btn-search">Search</a>
           </form>
 
           <?php if (isset($_SESSION['email'])) : ?>

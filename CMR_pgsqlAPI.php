@@ -289,13 +289,20 @@ function initDB()
     {
         $location_id = $_POST['location_id'] ?? null;
         $user_id = $_POST['user_id'] ?? null;
-        $mySQLStr = "Insert into check_in (user_id, travel_id) values('$user_id', '$location_id')";
-        $result = query($paPDO, $mySQLStr);
-        $query = "Select count(*) as count from check_in where travel_id = $location_id";
-        $result1 = query($paPDO, $query);
-        $count = $result1[0]['count'];
-        $html = "Số người đã check in tại đây: $count";
-        echo $html;
+        $queryCount = "Select count(*) as count from check_in where travel_id = '$location_id' and user_id = '$user_id'";
+        $result2 = query($paPDO, $queryCount);
+        $countItem = $result2[0]['count'] ?? 0;
+        if($countItem==0){
+            $mySQLStr = "Insert into check_in (user_id, travel_id) values('$user_id', '$location_id')";
+            $result = query($paPDO, $mySQLStr);
+            $query = "Select count(*) as count from check_in where travel_id = '$location_id'";
+            $result1 = query($paPDO, $query);
+            $count = $result1[0]['count'];
+            $html = "Số người đã check in tại đây: $count";
+            echo $html;
+        } else{
+            echo "error";
+        }
      }
 
 ?>
