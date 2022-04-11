@@ -20,6 +20,7 @@
         <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/build/ol.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/css/ol.css" type="text/css">
   <link rel="shortcut icon" href="assets/images/logo/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body class="bg-light" onload="initialize_map();">

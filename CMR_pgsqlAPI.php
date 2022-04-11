@@ -63,20 +63,20 @@ function initDB()
         //echo $mySQLStr;
         //echo "<br><br>";
         $points = "SELECT  travel_location.name  
-        from  \"travel_location\", \"gadm40_vnm_1\" 
-        where ST_Distance($paPoint, geom) < all(select ST_Distance($paPoint, geom) from \"travel_location\")";
+        from  \"travel_location\" 
+        where ST_Distance('SRID=4326;$paPoint', travel_location.geom) <= all(select ST_Distance('SRID=4326;$paPoint', travel_location.geom) from \"travel_location\") 
+        and ST_Distance('SRID=4326;$paPoint', travel_location.geom) < 0.05";
         $result = query($paPDO, $points);
-            
-        echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
-        die();
+        
         if ($result != null)
         {
+            $resFin = '<table>';
             // Lặp kết quả
-            // foreach ($result as $item){
-            //     return $item['geo'];
-            // }
-            
-            echo json_encode($result);
+        
+            $resFin = $resFin.'<tr><td>Tên địa điểm: '.$result[0]['name'].'</td></tr>';
+            $resFin = $resFin.'</table>';
+    
+            echo $resFin;
         }
         else
             return "null";

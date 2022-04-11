@@ -21,13 +21,32 @@ if (!$_SESSION['email']) {
 <table>
             <tr>
                 <td>
-                    <div id="map" style="width: 80vw; height: 100vh;"></div>
+                    <div id="map" onclick="popup();" style="width: 80vw; height: 100vh;"></div>
                 </td>
                 <td>
                     <button>Button</button>
                 </td>
             </tr>
         </table>
+        <div class=" modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Chi tiết</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                   <div class="content">
+
+                                   </div>
+                                   <button type="button" class="btn btn-primary">Check in</button>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
         <?php include 'CMR_pgsqlAPI.php' ?>
         
         <?php
@@ -259,32 +278,41 @@ if (!$_SESSION['email']) {
                     });
                     //*/
                 });
-                // map.on('click', function (evt) {
-                //     //alert("coordinate: " + evt.coordinate);
-                //     //var myPoint = 'POINT(12,5)';
-                //     var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-                //     var lon = lonlat[0];
-                //     var lat = lonlat[1];
-                //     var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                    
-                //   //  alert("myPoint: " + myPoint);
-                //     //*
-                //     $.ajax({
-                //         type: "POST",
-                //         url: "CMR_pgsqlAPI.php",
-                //         dataType: 'json',
-                //         data: {functionname: 'getInfoLocation', paPoint: myPoint},
+                map.on('click', function (evt) {
+                    //alert("coordinate: " + evt.coordinate);
+                    //var myPoint = 'POINT(12,5)';
+                    var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                    var lon = lonlat[0];
+                    var lat = lonlat[1];
+                    var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                  
+                  //  alert("myPoint: " + myPoint);
+                    //*
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                        data: {functionname: 'getInfoLocation', paPoint: myPoint},
                 
-                //         success : function (result, status, erro) {
-				// 		//	alert(result);
-                //             console.log(1);
-                //         },
-                //         error: function (req, status, error) {
-                //           //  alert(req + " " + status + " " + error);
-                //         }
-                //     });
-                //     //*/
-                // });
+                        success : function (result, status, erro) {
+                              var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+                                keyboard: true
+                                })
+                                console.log(result);
+                                if(result!='')
+                                {
+                                    myModal.show();
+                                
+                                    $('.modal-body .content').html(result);
+                                }
+                                
+                          //  console.log(1);
+                        },
+                        error: function (req, status, error) {
+                            console.log(req + " " + status + " " + error);
+                        }
+                    });
+                    //*/
+                });
             };
         </script>
 
