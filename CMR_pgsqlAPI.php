@@ -2,7 +2,7 @@
 function initDB()
 {
     // Kết nối CSDL
-    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '2525');
+    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '1');
     return $paPDO;
 }
 // initDB();
