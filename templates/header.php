@@ -20,6 +20,7 @@
         <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/build/ol.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/css/ol.css" type="text/css">
   <link rel="shortcut icon" href="assets/images/logo/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body class="bg-light" onload="initialize_map();">
@@ -51,9 +52,14 @@
                 <li class="nav-item">
                   <a class="nav-link" href="manager.php">Manager Users</a>
                 </li>
-
+                <li class="nav-link">
+                
+                </li>
           </ul>
-
+          <form class="d-flex" style="margin-right:15px;">
+                <input id="search-location" class="form-control me-2"  placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success btn-search">Search</button>
+          </form>
 
           <?php if (isset($_SESSION['email'])) : ?>
             <div class="auth ">

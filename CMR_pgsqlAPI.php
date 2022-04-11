@@ -1,9 +1,8 @@
 <?php
-
 function initDB()
 {
     // Kết nối CSDL
-    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '2525');
+    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '1');
     return $paPDO;
 }
 // initDB();
@@ -18,7 +17,7 @@ function initDB()
     {
         $paPDO = initDB();
         $paSRID = '4326';
-        $paPoint = $_POST['paPoint'];
+        $paPoint = $_POST['paPoint'] ?? null;
         $functionname = $_POST['functionname'];
         
         $aResult = "null";
@@ -28,10 +27,28 @@ function initDB()
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         else if($functionname == 'getInfoLocation')
             $aResult = getInfoLocation($paPDO,$paSRID,$paPoint);
-        
-            echo ($aResult);
+        else if($functionname == 'checkIn')
+            $aResult = checkIn($paPDO);
+        else if($functionname == 'search')
+            $aResult = search($paPDO);
+        return ($aResult);
     
        // closeDB($paPDO);
+    }
+
+    function search($paPDO)
+    {
+        $keyword = $_POST['keyword'];
+        $query = "SELECT ST_AsGeoJson(travel_location.geom) as geo, ST_AsGeoJson(gadm40_vnm_1.geom) as geo_gadm
+        from \"gadm40_vnm_1\", \"travel_location\" 
+        where ST_within(travel_location.geom, gadm40_vnm_1.geom)=true 
+        and gadm40_vnm_1.name_1 = '$keyword'
+        ";
+       
+      //  $query = "SELECT ST_AsGeoJson(geom) as geo from gadm40_vnm_1 where name_1 = '$keyword'";
+        $result = query($paPDO, $query);
+        echo json_encode($result);
+       
     }
 
     function getInfoLocation($paPDO,$paSRID,$paPoint)
@@ -63,21 +80,25 @@ function initDB()
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
         //echo $mySQLStr;
         //echo "<br><br>";
-        $points = "SELECT  travel_location.name  
-        from  \"travel_location\", \"gadm40_vnm_1\" 
-        where ST_Distance($paPoint, geom) < all(select ST_Distance($paPoint, geom) from \"travel_location\")";
+        $points = "SELECT  travel_location.name, travel_location.id
+        from  \"travel_location\" 
+        where ST_Distance('SRID=4326;$paPoint', travel_location.geom) <= all(select ST_Distance('SRID=4326;$paPoint', travel_location.geom) from \"travel_location\") 
+        and ST_Distance('SRID=4326;$paPoint', travel_location.geom) < 0.05";
         $result = query($paPDO, $points);
-            
-        echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
-        die();
         if ($result != null)
         {
+            $location_id = $result[0]['id'];
+            $query = "Select count(*) as count from \"check_in\" where travel_id = '$location_id'";
+            $result1 =  query($paPDO, $query );
+            $countCheckIn = $result1[0]['count'] ?? 0;
+            $resFin = '<table>';
             // Lặp kết quả
-            // foreach ($result as $item){
-            //     return $item['geo'];
-            // }
-            
-            echo json_encode($result);
+            $resFin = $resFin."<input type='hidden' id='location_id' value='$location_id'>";
+            $resFin = $resFin.'<tr><td>Tên địa điểm: '.$result[0]['name'].'</td></tr>';
+            $resFin = $resFin.'<tr><td class="checkIn">Số người check in tại đây: '.$countCheckIn.'</td></tr>';
+            $resFin = $resFin.'</table>';
+    
+            echo $resFin;
         }
         else
             return "null";
@@ -211,9 +232,9 @@ function initDB()
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
         //echo $mySQLStr;
         //echo "<br><br>";
-        $points = "SELECT ST_AsGeoJson(travel_location_2.geom) as geo
-        from \"gadm40_vnm_1\", \"travel_location_2\" 
-        where ST_within(travel_location_2.geom, gadm40_vnm_1.geom)=true 
+        $points = "SELECT ST_AsGeoJson(travel_location.geom) as geo, ST_AsGeoJson(gadm40_vnm_1.geom) as geo_gadm,  travel_location.name 
+        from \"gadm40_vnm_1\", \"travel_location\" 
+        where ST_within(travel_location.geom, gadm40_vnm_1.geom)=true 
         and
         ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,gadm40_vnm_1.geom)";
         $result = query($paPDO, $points);
@@ -222,12 +243,12 @@ function initDB()
         if ($result != null)
         {
             // Lặp kết quả
-            foreach ($result as $item){
-                echo $item['geo'];
-            }
+            // foreach ($result as $item){
+            //     return $item['geo'];
+            // }
         //     echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
         // die();
-           // return (($result));
+            echo json_encode($result);
         }
         else
             return "null";
@@ -262,3 +283,19 @@ function initDB()
         else
             return "null";
     }
+
+
+    function checkIn($paPDO)
+    {
+        $location_id = $_POST['location_id'] ?? null;
+        $user_id = $_POST['user_id'] ?? null;
+        $mySQLStr = "Insert into check_in (user_id, travel_id) values('$user_id', '$location_id')";
+        $result = query($paPDO, $mySQLStr);
+        $query = "Select count(*) as count from check_in where travel_id = $location_id";
+        $result1 = query($paPDO, $query);
+        $count = $result1[0]['count'];
+        $html = "Số người đã check in tại đây: $count";
+        echo $html;
+     }
+
+?>
