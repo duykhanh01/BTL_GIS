@@ -3,11 +3,11 @@
 function initDB()
 {
     // Kết nối CSDL
-    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '1');
+    $paPDO = new PDO('pgsql:host=localhost;dbname=btl_gis;port=5432', 'postgres', '2525');
     return $paPDO;
 }
 // initDB();
- $mySQLStr = "SELECT ST_AsGeoJson(geom), name from travel_location_2";
+ $mySQLStr = "SELECT ST_AsGeoJson(geom), name from travel_location";
  //echo $mySQLStr;
  //echo "<br><br>";
  $result = query(initDB(), $mySQLStr);
@@ -26,14 +26,63 @@ function initDB()
             $aResult = getGeoCMRToAjax($paPDO, $paSRID, $paPoint);
         else if ($functionname == 'getInfoCMRToAjax')
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
-        
+        else if($functionname == 'getInfoLocation')
+            $aResult = getInfoLocation($paPDO,$paSRID,$paPoint);
         
             echo ($aResult);
     
-        closeDB($paPDO);
+       // closeDB($paPDO);
     }
 
-    
+    function getInfoLocation($paPDO,$paSRID,$paPoint)
+    {
+       
+
+        // $paPoint = str_replace(',', ' ', $paPoint);
+        
+        // $points = "SELECT  travel_location.name 
+        // from \"travel_location\" 
+        // where  ST_Distance($paPoint, geom) < all(select ST_Distance($paPoint, geom) from \"travel_location\");
+        
+        // $result = query(initDB(), $points);
+      
+        
+        // if ($result != null)
+        // {
+            
+        //     echo json_encode($result);
+        // }
+        // else
+        //     return null;
+            //echo $paPoint;
+        //echo "<br>";
+        $paPoint = str_replace(',', ' ', $paPoint);
+        //echo $paPoint;
+        //echo "<br>";
+        //$mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=4326;POINT(12 5)'::geometry,geom)";
+        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
+        //echo $mySQLStr;
+        //echo "<br><br>";
+        $points = "SELECT  travel_location.name  
+        from  \"travel_location\", \"gadm40_vnm_1\" 
+        where ST_Distance($paPoint, geom) < all(select ST_Distance($paPoint, geom) from \"travel_location\")";
+        $result = query($paPDO, $points);
+            
+        echo '<pre>' , var_dump($result[0]['name']) , '</pre>';
+        die();
+        if ($result != null)
+        {
+            // Lặp kết quả
+            // foreach ($result as $item){
+            //     return $item['geo'];
+            // }
+            
+            echo json_encode($result);
+        }
+        else
+            return "null";
+    }
+
     function query($paPDO, $paSQLStr)
     {
         try

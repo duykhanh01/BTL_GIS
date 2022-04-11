@@ -85,14 +85,15 @@ if (!$_SESSION['email']) {
       }
       console.log(features);
       // create the source and layer for random features
-      const vectorSource = new ol.source.Vector({
+      let vectorSource = new ol.source.Vector({
         features
       });
-      const vectorLayer_1 = new ol.layer.Vector({
+  
+      let vectorLayer_1 = new ol.layer.Vector({
         source: vectorSource,
         style: new ol.style.Style({
           image: new ol.style.Circle({
-            radius: 2,
+            radius: 4,
             fill: new ol.style.Fill({color: 'red'})
           })
         })
@@ -107,7 +108,6 @@ if (!$_SESSION['email']) {
                 let map_name = 'travel_location_2';
                 $('.change-map').click(function(){
                     map_name =  ($(this).attr('id'));
-                    alert(map_name);
                 })
                 var layerCMR_adm1 = new ol.layer.Image({
                     source: new ol.source.ImageWMS({
@@ -122,12 +122,12 @@ if (!$_SESSION['email']) {
                     })
                 });
 
-                console.log(layerCMR_adm1)
                 var viewMap = new ol.View({
                     center: ol.proj.fromLonLat([mapLng, mapLat]),
                     zoom: mapDefaultZoom
                     //projection: projection
                 });
+           
                 map = new ol.Map({
                     target: "map",
                     layers: [layerBG, vectorLayer_1],
@@ -218,8 +218,9 @@ if (!$_SESSION['email']) {
                     $.ajax({
                         type: "POST",
                         url: "CMR_pgsqlAPI.php",
-                        //dataType: 'json',
+                        dataType: 'json',
                         data: {functionname: 'getGeoCMRToAjax', paPoint: myPoint},
+                
                         success : function (result, status, erro) {
 							
 							console.log((result));
@@ -229,12 +230,38 @@ if (!$_SESSION['email']) {
 							// }
                           highLightObj(result);
                         },
-                        error: function (req, status, error) {
-                            alert(req + " " + status + " " + error);
-                        }
+                        // error: function (req, status, error) {
+                        //    // alert(req + " " + status + " " + error);
+                        // }
                     });
                     //*/
                 });
+                // map.on('click', function (evt) {
+                //     //alert("coordinate: " + evt.coordinate);
+                //     //var myPoint = 'POINT(12,5)';
+                //     var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                //     var lon = lonlat[0];
+                //     var lat = lonlat[1];
+                //     var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                    
+                //   //  alert("myPoint: " + myPoint);
+                //     //*
+                //     $.ajax({
+                //         type: "POST",
+                //         url: "CMR_pgsqlAPI.php",
+                //         dataType: 'json',
+                //         data: {functionname: 'getInfoLocation', paPoint: myPoint},
+                
+                //         success : function (result, status, erro) {
+				// 		//	alert(result);
+                //             console.log(1);
+                //         },
+                //         error: function (req, status, error) {
+                //           //  alert(req + " " + status + " " + error);
+                //         }
+                //     });
+                //     //*/
+                // });
             };
         </script>
 
