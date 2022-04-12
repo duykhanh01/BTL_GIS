@@ -39,6 +39,11 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="index.php">Trang chủ</a>
+
+            </li>
+            <li class="nav-item">
+
+              <a class="nav-link active" aria-current="page" href="all_location.php">Tất cả địa điểm</a>
             </li>
             
           </ul>
