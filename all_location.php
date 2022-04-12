@@ -57,6 +57,7 @@ if (!$_SESSION['email']) {
                 <div class="region-top">
 
                 </div>
+                <p class="btn btn-show-more" style="color:red; margin-bottom:0px;">Hiển thị tất cả</p>
                 
         </div>
        </div>
@@ -198,7 +199,7 @@ if (!$_SESSION['email']) {
                     source: new ol.source.OSM({})
                 });
                 //*/
-                let map_name = 'travel_location_2';
+                let map_name = 'travel_location_test';
                 $('.change-map').click(function(){
                     map_name =  ($(this).attr('id'));
                 })
@@ -223,12 +224,27 @@ if (!$_SESSION['email']) {
            
                 map = new ol.Map({
                     target: "map",
-                    layers: [layerBG, vectorLayer_1],
-                    //layers: [layerCMR_adm1],
+                  //  layers: [layerBG, vectorLayer_1],
+                    layers: [layerBG],
                     view: viewMap
                 });
                 //map.getView().fit(bounds, map.getSize());
-                
+                let show_more_location = 0;
+                $('.btn-show-more').click(function(){
+                    if(show_more_location==0)
+                    {
+                        map.addLayer(layerCMR_adm1);
+                        show_more_location = 1;
+                        $('.btn-show-more').text('Ẩn tất cả');
+                    }                    
+                    else
+                    {
+                        map.removeLayer(layerCMR_adm1);
+                        show_more_location = 0;
+                        $('.btn-show-more').text('Hiển thị tất cả');
+                    }
+                        
+                })
                 var styles = {
                     'MultiPolygon': new ol.style.Style({
                         

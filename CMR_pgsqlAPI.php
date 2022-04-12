@@ -27,6 +27,8 @@ function initDB()
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         else if($functionname == 'getInfoLocation')
             $aResult = getInfoLocation($paPDO,$paSRID,$paPoint);
+        else if($functionname == 'getInfoCMRToAjax_test')
+            $aResult = getInfoCMRToAjax_test($paPDO,$paSRID,$paPoint);
         else if($functionname == 'checkIn')
             $aResult = checkIn($paPDO);
         else if($functionname == 'search')
@@ -353,5 +355,53 @@ function initDB()
             echo "error";
         }
      }
+     function getInfoCMRToAjax_test($paPDO,$paSRID,$paPoint)
+    {
+        
+        $paPoint = str_replace(',', ' ', $paPoint);
+        
+        $mySQLStr = "SELECT name_1 as tinh,name_2 as huyen, ST_Area(geom) as dientich,slbenhnhan as sl  from gadm36_vnm_2 where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
+       
+        $result = query($paPDO, $mySQLStr);
+        
+        if ($result != null)
+        {
 
+            
+            $resFin = '<div>';
+            // Lặp kết quả
+            foreach ($result as $item){
+               if ($item['sl'] <  20) {
+                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;"><div>Diện tích: '.$item['dientich'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
+               }
+               else if ( $item['sl'] >= 20 &&  $item['sl'] < 50) {
+                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;"><div>Diện tích: '.$item['dientich'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
+               }
+               else if ( $item['sl'] >= 50 &&  $item['sl'] < 150) {
+                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;"><div>Diện tích: '.$item['dientich'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
+               }
+               else if ($item['sl'] >= 150) {
+                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;"><div>Diện tích: '.$item['dientich'].'</div></div>';
+                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
+               
+               }
+               break;
+            }
+            $resFin = $resFin.'</div>';
+            return $resFin;
+        }
+        else
+            return "null";
+    }
 ?>
