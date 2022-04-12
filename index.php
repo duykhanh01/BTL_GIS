@@ -37,6 +37,9 @@ if (!$_SESSION['email']) {
         overflow: hidden;
         height: 45px;
     }
+    .region-info p{
+        margin-bottom: 0px;
+    }
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,15 +52,18 @@ if (!$_SESSION['email']) {
        <div class="row">
        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 " id="map" onclick="popup();" style="height: 100vh;"></div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3" >
-                <p class="btn btn-top-travel" style="color:red; margin-bottom:0px;">Top 5 địa điểm yêu thích</p>
+                <p class="btn btn-top-travel" style="color:red; margin-bottom:0px; padding-left:0px;">Top 5 địa điểm yêu thích</p>
                 <div class="article-top">
 
                 </div>
-                <p class="btn btn-top-region" style="color:red; margin-bottom:0px;">Top 5 tỉnh nhiều người tới thăm nhất</p>
+                <p class="btn btn-top-region" style="color:red; margin-bottom:0px; padding-left:0px;">Top 5 tỉnh nhiều người tới thăm nhất</p>
                 <div class="region-top">
 
                 </div>
                 
+                <div class="region-info">
+                   
+                </div>
         </div>
        </div>
 
@@ -99,19 +105,6 @@ if (!$_SESSION['email']) {
             </div>
         </div>
         <?php include 'CMR_pgsqlAPI.php' ?>
-        
-        <?php
-            //$myPDO = initDB();
-            //$mySRID = '4326';
-            //$pointFormat = 'POINT(12,5)';
-
-            //example1($myPDO);
-            //example2($myPDO);
-            //example3($myPDO,'4326','POINT(12,5)');
-            //$result = getResult($myPDO,$mySRID,$pointFormat);
-
-            //closeDB($myPDO);
-        ?>
         <script>
            
             var format = 'image/png';
@@ -126,31 +119,12 @@ if (!$_SESSION['email']) {
             var mapLng = cenX;
             var mapDefaultZoom = 6;
             function initialize_map() {
-				// thêm
-
-		// const features = [];		
-		// function creatPoint(points)
-		// {
 			
-		// 	for (i = 0; i < length(points); i++) {
-		// 		features.push(new ol.Feature({
-		// 			geometry: new ol.geom.Point(ol.proj.fromLonLat([
-		// 				points.x	, points.y
-		// 		]))
-		// 		}));
-      	// 	}
-		// }		
       
 		const getRandomNumber = function (min, ref) {
         return Math.random() * ref + min;
       }
       const features = [];
-    //   features.push(new ol.Feature({
-    //         geometry: new ol.geom.Point(ol.proj.fromLonLat([
-    //             105.61516,21.39584
-    //         ]))
-    //         }));
-    
     function setFeatures(points)
     {
        
@@ -160,7 +134,6 @@ if (!$_SESSION['email']) {
                 JSON.parse(points[i]['geo']).coordinates[0]  ,  JSON.parse(points[i]['geo']).coordinates[1]
             ]))
             }));
-           //console.log(JSON.parse(points[i]['geo']).coordinates[0]);
         }
         
         setSourceMap();
@@ -218,16 +191,13 @@ if (!$_SESSION['email']) {
                 var viewMap = new ol.View({
                     center: ol.proj.fromLonLat([mapLng, mapLat]),
                     zoom: mapDefaultZoom
-                    //projection: projection
                 });
            
                 map = new ol.Map({
                     target: "map",
                     layers: [layerBG, vectorLayer_1],
-                    //layers: [layerCMR_adm1],
                     view: viewMap
                 });
-                //map.getView().fit(bounds, map.getSize());
                 
                 var styles = {
                     'MultiPolygon': new ol.style.Style({
@@ -242,7 +212,6 @@ if (!$_SESSION['email']) {
                     return styles[feature.getGeometry().getType()];
                 };
                 var vectorLayer = new ol.layer.Vector({
-                    //source: vectorSource,
                     style: styleFunction
                 });
                 map.addLayer(vectorLayer);
@@ -273,6 +242,7 @@ if (!$_SESSION['email']) {
                     var vectorLayer = new ol.layer.Vector({
                         source: vectorSource
                     });
+                    
                     map.addLayer(vectorLayer);
                 }
                 function highLightGeoJsonObj(paObjJson) {
@@ -283,30 +253,17 @@ if (!$_SESSION['email']) {
                         })
                     });
 					vectorLayer.setSource(vectorSource);
-                    /*
-                    var vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                    });
-                    map.addLayer(vectorLayer);
-                    */
                 }
                 function highLightObj(result) {
-                    //alert("result: " + result);
                     var strObjJson = createJsonObj(result);
-                    //alert(strObjJson);
                     var objJson = JSON.parse(strObjJson);
-                    //alert(JSON.stringify(objJson));
-                    //drawGeoJsonObj(objJson);
                     highLightGeoJsonObj(objJson);
                 }
                 map.on('singleclick', function (evt) {
-                    //alert("coordinate: " + evt.coordinate);
-                    //var myPoint = 'POINT(12,5)';
                     var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                     var lon = lonlat[0];
                     var lat = lonlat[1];
                     var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                    //alert("myPoint: " + myPoint);
                     //*
                     $.ajax({
                         type: "POST",
@@ -318,23 +275,39 @@ if (!$_SESSION['email']) {
 							points =(result);
                             vectorSource.clear();
                             setFeatures(points);
-
                             highLightObj(points[0]['geo_gadm']);
                            
                         },
                        
                     });
                 });
+
                 map.on('click', function (evt) {
-                    //alert("coordinate: " + evt.coordinate);
-                    //var myPoint = 'POINT(12,5)';
                     var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
                     var lon = lonlat[0];
                     var lat = lonlat[1];
                     var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                  
-                  //  alert("myPoint: " + myPoint);
-                    //*
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                       
+                        data: {functionname: 'getInfoRegion', paPoint: myPoint},
+                        success : function (result, status, erro) {
+                            $('.region-info').html(result);
+                        },
+                        error: function (req, status, error) {
+                            console.log(req + " " + status + " " + error);
+                        }
+                       
+                    });
+                });
+
+                map.on('click', function (evt) {
+                   
+                    var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                    var lon = lonlat[0];
+                    var lat = lonlat[1];
+                    var myPoint = 'POINT(' + lon + ' ' + lat + ')';
                     $.ajax({
                         type: "POST",
                         url: "CMR_pgsqlAPI.php",
@@ -397,7 +370,7 @@ if (!$_SESSION['email']) {
                         dataType: 'json',
                         data: {functionname: 'search', 'keyword': keyword},
                         success : function (result, status, erro) {
-                            console.log(result);
+                            
                             setFeatures(result);
                             highLightObj((result[0]['geo_gadm']));
                         },
@@ -410,8 +383,6 @@ if (!$_SESSION['email']) {
                 let show_travel_top = 0;
                 let show_region_top = 0;
                 $('.btn-top-travel').on('click', function (evt) {
-                    
-                    
                     $.ajax({
                         type: "POST",
                         url: "CMR_pgsqlAPI.php",
@@ -440,8 +411,6 @@ if (!$_SESSION['email']) {
                     //*/
                 });
                 $('.btn-top-region').on('click', function (evt) {
-                    
-                    
                     $.ajax({
                         type: "POST",
                         url: "CMR_pgsqlAPI.php",
@@ -470,37 +439,6 @@ if (!$_SESSION['email']) {
                     //*/
                 });
             };
-            // test
-            function displayObjInfo_test(result)
-            {
-            alert("result: " + result);
-            //alert("coordinate des: " + coordinate);
-            $("#info").html(result);
-           
-            }
-            map.on('singleclick', function () {
-                alert(123);
-            var lonlat = ol.proj.transform( 'EPSG:3857', 'EPSG:4326');
-            var lon = lonlat[0];
-            var lat = lonlat[1];
-            var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-            //alert("myPoint: " + myPoint);
-               
-            $.ajax({
-                type: "POST",
-                url: "API.php",
-                data: {functionname: 'getInfoCMRToAjax_test', paPoint: myPoint},
-                success : function (result, status, erro) {
-                    displayObjInfo_test(result );
-                },
-                error: function (req, status, error) {
-                    alert(req + " " + status + " " + error);
-                }
-            });
-            //*/
-        });
-        
-            // end test
         </script>
 
 

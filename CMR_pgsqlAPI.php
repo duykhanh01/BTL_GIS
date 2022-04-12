@@ -27,8 +27,8 @@ function initDB()
             $aResult = getInfoCMRToAjax($paPDO, $paSRID, $paPoint);
         else if($functionname == 'getInfoLocation')
             $aResult = getInfoLocation($paPDO,$paSRID,$paPoint);
-        else if($functionname == 'getInfoCMRToAjax_test')
-            $aResult = getInfoCMRToAjax_test($paPDO,$paSRID,$paPoint);
+        else if($functionname == 'getInfoRegion')
+            $aResult = getInfoRegion($paPDO,$paSRID,$paPoint);
         else if($functionname == 'checkIn')
             $aResult = checkIn($paPDO);
         else if($functionname == 'search')
@@ -57,6 +57,34 @@ function initDB()
        
     }
 
+    function getInfoRegion($paPDO,$paSRID,$paPoint)
+    {
+        $paPoint = str_replace(',', ' ', $paPoint);
+        $points = "SELECT  gadm40_vnm_1.name_1 as name, ST_Area(geom) as area, ST_perimeter(geom) as perimeter, region.number_travel
+        from \"gadm40_vnm_1\", 
+            (select count(travel_location.id) as number_travel, gadm40_vnm_1.name_1 as name_region
+            from travel_location, gadm40_vnm_1
+            where ST_within(travel_location.geom, gadm40_vnm_1.geom)
+            group by gadm40_vnm_1.name_1) as region
+        where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,gadm40_vnm_1.geom) and gadm40_vnm_1.name_1 = region.name_region";
+        $result = query($paPDO, $points);
+        
+        if ($result != null)
+        {
+           
+            $resFin = '<table>';
+            // Lặp kết quả
+            $resFin .='<p>Chào mừng bạn đã đến với '.$result[0]["name"].'</p>';
+            $resFin .='<p>'.$result[0]["name"].' có '.$result[0]["number_travel"].' điểm du lịch </p>';
+            $resFin .='<p>Chu vi =  '.round($result[0]["perimeter"],3).'</p>';
+            $resFin .='<p>Diện tích =  '.round($result[0]["area"],3).'</p>';
+           
+    
+            echo $resFin;
+        }
+        else
+            return "null";
+    }
 
     function getTopFiveTravel()
     {
@@ -82,7 +110,7 @@ function initDB()
                     <h3 class="title">
                         <a href="#">'.$values['name'].'</a>
                     </h3>
-                    <span style="display: block;">Số người check in '.$values['number_check'].'</span>
+                    <span style="display: block;">Số người check in: <span style="color: red; font-weight: bold;">'.$values['number_check'].'</span></span>
                     <p>'.$values['description'].'</p>
                 </div>
                 </div>
@@ -355,53 +383,5 @@ function initDB()
             echo "error";
         }
      }
-     function getInfoCMRToAjax_test($paPDO,$paSRID,$paPoint)
-    {
-        
-        $paPoint = str_replace(',', ' ', $paPoint);
-        
-        $mySQLStr = "SELECT name_1 as tinh,name_2 as huyen, ST_Area(geom) as dientich,slbenhnhan as sl  from gadm36_vnm_2 where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
-       
-        $result = query($paPDO, $mySQLStr);
-        
-        if ($result != null)
-        {
 
-            
-            $resFin = '<div>';
-            // Lặp kết quả
-            foreach ($result as $item){
-               if ($item['sl'] <  20) {
-                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;"><div>Diện tích: '.$item['dientich'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:green;padding:5px 20px;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
-               }
-               else if ( $item['sl'] >= 20 &&  $item['sl'] < 50) {
-                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;"><div>Diện tích: '.$item['dientich'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:yellow;padding:5px 20px;color:#000;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
-               }
-               else if ( $item['sl'] >= 50 &&  $item['sl'] < 150) {
-                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;"><div>Diện tích: '.$item['dientich'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:orange;padding:5px 20px;color:#000;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
-               }
-               else if ($item['sl'] >= 150) {
-                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;border-top-left-radius:10px;border-top-right-radius:10px;"><div>Huyện: '.$item['huyen'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;"><div>Tỉnh: '.$item['tinh'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;"><div>Diện tích: '.$item['dientich'].'</div></div>';
-                $resFin = $resFin.'<div style="background-color:red;padding:5px 20px;border-bottom-left-radius:10px;border-bottom-right-radius:10px;"><div>Số lượng bệnh nhân: '.$item['sl'].'</div></div>';
-               
-               }
-               break;
-            }
-            $resFin = $resFin.'</div>';
-            return $resFin;
-        }
-        else
-            return "null";
-    }
 ?>
