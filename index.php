@@ -11,18 +11,56 @@ if (!$_SESSION['email']) {
 
 
 ?>
-
+<style>
+    a{
+        text-decoration: none !important;
+    }
+    .title {
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 26px;
+    color: #333;
+    
+    width: 150;
+    }
+    .title a{
+        color: #333;
+    }
+    .sub-content p{
+        display: -webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 45px;
+    }
+</style>
 <!DOCTYPE html>
 <html lang="en">
 
 <?php include('templates/header.php'); ?>
 
 
-    <div class="d-flex w-100 mt-3" style="position: relative;">
-    
-        <div id="map" onclick="popup();" style="width: 70%; height: 100vh;"></div>
+    <div class=" w-100 mt-3 container" style="position: relative;">
         
-      
+       <div class="row">
+       <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 " id="map" onclick="popup();" style="height: 100vh;"></div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3" >
+                <p class="btn btn-top-travel" style="color:red; margin-bottom:0px;">Top 5 địa điểm yêu thích</p>
+                <div class="article-top">
+
+                </div>
+                <p class="btn btn-top-region" style="color:red; margin-bottom:0px;">Top 5 tỉnh nhiều người tới thăm nhất</p>
+                <div class="region-top">
+
+                </div>
+                
+        </div>
+       </div>
+
     </div>
    
         <div class=" modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -75,12 +113,13 @@ if (!$_SESSION['email']) {
             //closeDB($myPDO);
         ?>
         <script>
+           
             var format = 'image/png';
             var map;
-            var minX = 8.49874900000009;
-            var minY = 1.65254800000014;
-            var maxX = 16.1921150000001;
-            var maxY = 13.0780600000001;
+            var minX = 5.49874900000009;
+            var minY = 1;
+            var maxX = 205.1921150000001;
+            var maxY = 30.0780600000001;
             var cenX = (minX + maxX) / 2;
             var cenY = (minY + maxY) / 2;
             var mapLat = cenY;
@@ -111,6 +150,7 @@ if (!$_SESSION['email']) {
     //             105.61516,21.39584
     //         ]))
     //         }));
+    
     function setFeatures(points)
     {
        
@@ -367,6 +407,68 @@ if (!$_SESSION['email']) {
                        
                     });
                 })
+                let show_travel_top = 0;
+                let show_region_top = 0;
+                $('.btn-top-travel').on('click', function (evt) {
+                    
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                        data: {functionname: 'getTopFiveTravel'},
+                
+                        success : function (result, status, erro) {
+                            $('.article-top').html(result);
+                            $('btn-top-travel').children().hasClass('active-top')
+                            {
+                                if(show_travel_top ==0 )
+                                {
+                                    $('.article-top').addClass('d-none');
+                                    show_travel_top = 1;
+                                }
+                                else
+                                {
+                                    $('.article-top').removeClass('d-none');
+                                    show_travel_top = 0 ;
+                                }
+                            }
+                        },
+                        error: function (req, status, error) {
+                            console.log(req + " " + status + " " + error);
+                        }
+                    });
+                    //*/
+                });
+                $('.btn-top-region').on('click', function (evt) {
+                    
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "CMR_pgsqlAPI.php",
+                        data: {functionname: 'getTopFiveRegion'},
+                
+                        success : function (result, status, erro) {
+                            $('.region-top').html(result);
+                            $('btn-top-region').children().hasClass('active-top')
+                            {
+                                if(show_region_top ==0 )
+                                {
+                                    $('.region-top').addClass('d-none');
+                                    show_region_top = 1;
+                                }
+                                else
+                                {
+                                    $('.region-top').removeClass('d-none');
+                                    show_region_top = 0 ;
+                                }
+                            }
+                        },
+                        error: function (req, status, error) {
+                            console.log(req + " " + status + " " + error);
+                        }
+                    });
+                    //*/
+                });
             };
         </script>
 

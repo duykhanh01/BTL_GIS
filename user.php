@@ -26,7 +26,8 @@ if (($id == $_SESSION['id'])) {
         $newpass = $_POST['newpassword'];
         $cpass = $_POST['cpassword'];
         $pass_saved = $user['password'];
-        if (!password_verify($pass, $pass_saved) and $level != 2) $errors[] = 'Mật khẩu hiện tại không chính xác';
+        $pass = $_POST['password'];
+        if (!password_verify($pass, $pass_saved)) $errors[] = 'Mật khẩu hiện tại không chính xác';
 
 
         if ($newpass != $cpass) $errors[] = 'Mật khẩu không khớp';

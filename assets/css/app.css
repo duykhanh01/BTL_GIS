@@ -298,3 +298,14 @@ img.avt.img-thumbnail{
     transform: rotate(180deg)
 }
 
+.title {
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 26px;
+    color: #333;
+    margin-bottom: 8px;
+}

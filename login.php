@@ -27,7 +27,7 @@ if (isset($_POST['submit-login'])) {
                 $_SESSION['name'] = $user_logged['full_name'];
                 $_SESSION['id'] = $user_logged['id'];
                 $_SESSION['user_image'] = $user_logged['avatar'];
-                header('Location: admin.php');
+                header('Location: index.php');
             } else {
                 $errors['all'] = "Tên đăng nhập hoặc mật khẩu không chính xác";
                 $email = $password  = "";

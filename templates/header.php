@@ -6,7 +6,7 @@
 ?>
 
 <head>
-  <title>Danh bạ điện tử</title>
+  <title>Nhóm 1</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -38,26 +38,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+              <a class="nav-link active" aria-current="page" href="index.php">Trang chủ</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="admin.php">Admin</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="manager.php">Manager Users</a>
-                </li>
-                <li class="nav-link">
-                
-                </li>
+            
           </ul>
           <div class="d-flex" style="margin-right:15px;">
-                <input id="search-location" class="form-control me-2"  placeholder="Search" aria-label="Search">
+                <input id="search-location" class="form-control me-2"  placeholder="Tìm kiếm" aria-label="Tìm kiếm">
                 <a href="#" class="btn btn-outline-success btn-search">Search</a>
           </div>
 
@@ -65,7 +51,7 @@
             <div class="auth ">
               <div class="btn-group">
                 <div class="dropdown-toggle d-flex" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer">
-                  <img src="<?php echo $_SESSION['avatar']; ?>" id="avatar" class="avt img-thumbnail m-auto" alt="...">
+                  <img src="<?php echo $_SESSION['user_image']; ?>" id="avatar" class="avt img-thumbnail m-auto" alt="...">
                   <p class="my-auto mx-2"><b><?php echo $_SESSION['name']; ?></b></p>
                 </div>
                 <ul class="dropdown-menu">

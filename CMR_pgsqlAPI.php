@@ -31,6 +31,10 @@ function initDB()
             $aResult = checkIn($paPDO);
         else if($functionname == 'search')
             $aResult = search($paPDO);
+        else if($functionname == 'getTopFiveTravel')
+            $aResult = getTopFiveTravel();
+        else if($functionname == 'getTopFiveRegion')
+            $aResult = getTopFiveRegion();  
         return ($aResult);
     
        // closeDB($paPDO);
@@ -51,39 +55,84 @@ function initDB()
        
     }
 
+
+    function getTopFiveTravel()
+    {
+        $query = "select article.description, article.images, temp.name, temp.number_check  from article, 
+        (select  check_in.travel_id, count(check_in.travel_id)
+        as number_check ,travel_location.name from travel_location, check_in
+        where travel_location.id = check_in.travel_id
+        group by check_in.travel_id, travel_location.name order by count(check_in.travel_id) DESC) 
+        as temp where article.travel_id = temp.travel_id  limit 5";
+        $result = query(initDB(), $query);
+        $content = '';
+        foreach($result as $values)
+        {
+            $content .= '
+            <div class="main-content d-flex w-100 mb-2 active-top">   
+                <div class="main-content d-flex border rounded w-100 mb-2">
+                <div class="image-thumbnail img-fluid" >
+                    <a href="#">
+                        <img src="'.$values['images'].'" style="width:145px; height:120px" alt="">
+                    </a>
+                </div>
+                <div class="sub-content" style="margin-left:10px;">
+                    <h3 class="title">
+                        <a href="#">'.$values['name'].'</a>
+                    </h3>
+                    <span style="display: block;">Số người check in '.$values['number_check'].'</span>
+                    <p>'.$values['description'].'</p>
+                </div>
+                </div>
+            </div>';
+        }
+        echo $content;
+    }
+
+    function getTopFiveRegion()
+    {
+        $query = "select ga.name_1 as name, ga.avatar, sum(number_check) as number_region, ST_area(ga.geom) as area, ST_Perimeter(ga.geom) as perimeter from gadm40_vnm_1 ga, 
+        (select  check_in.travel_id, count(check_in.travel_id) as number_check from travel_location, check_in where travel_location.id = check_in.travel_id
+        group by check_in.travel_id order by count(check_in.travel_id)) as temp, travel_location as trv 
+            where trv.id = temp.travel_id
+                and ST_Within(trv.geom, ga.geom) = true
+            group by ga.name_1, ga.avatar, ST_area(ga.geom), ST_Perimeter(ga.geom)
+            order by number_region DESC
+            limit 5";
+        $result = query(initDB(), $query);
+        $content = '';
+        foreach($result as $values)
+        {
+            $content .= '
+            <div class="main-content d-flex w-100 mb-2 active-top">   
+                <div class="main-content d-flex border rounded w-100 mb-2">
+                <div class="image-thumbnail " >
+                    <a href="#">
+                        <img src="'.$values['avatar'].'" class="img-fluid" style="width:145px; height:120px" alt="">
+                    </a>
+                </div>
+                <div class="sub-content" style="margin-left:10px;">
+                    <h3 class="title">
+                        <a href="#">'.$values['name'].'</a>
+                    </h3>
+                    <span style="display: block;">Khách du lịch <span style="color: orange;">'.$values['number_region'].'</span> người</span>
+                    <span style="display: block;">Chu vi <span style="color: orange;">'. round($values['perimeter'],3).'</span></span>
+                    <span style="display: block;">Diện tích <span style="color: orange;">'.round($values['area'],3).'</span></span>
+
+                </div>
+                </div>
+            </div>';
+        }
+        echo $content;
+    }
+
     function getInfoLocation($paPDO,$paSRID,$paPoint)
     {
-       
-
-        // $paPoint = str_replace(',', ' ', $paPoint);
-        
-        // $points = "SELECT  travel_location.name 
-        // from \"travel_location\" 
-        // where  ST_Distance($paPoint, geom) < all(select ST_Distance($paPoint, geom) from \"travel_location\");
-        
-        // $result = query(initDB(), $points);
-      
-        
-        // if ($result != null)
-        // {
-            
-        //     echo json_encode($result);
-        // }
-        // else
-        //     return null;
-            //echo $paPoint;
-        //echo "<br>";
         $paPoint = str_replace(',', ' ', $paPoint);
-        //echo $paPoint;
-        //echo "<br>";
-        //$mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=4326;POINT(12 5)'::geometry,geom)";
-        $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm40_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
-        //echo $mySQLStr;
-        //echo "<br><br>";
-        $points = "SELECT  travel_location.name, travel_location.id
+       $points = "SELECT  travel_location.name, travel_location.id
         from  \"travel_location\" 
         where ST_Distance('SRID=4326;$paPoint', travel_location.geom) <= all(select ST_Distance('SRID=4326;$paPoint', travel_location.geom) from \"travel_location\") 
-        and ST_Distance('SRID=4326;$paPoint', travel_location.geom) < 0.05";
+        and ST_Distance('SRID=4326;$paPoint', travel_location.geom) < 0.0005";
         $result = query($paPDO, $points);
         if ($result != null)
         {
