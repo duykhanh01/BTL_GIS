@@ -191,8 +191,81 @@ if (($id == $_SESSION['id'])) {
                     </div>
                     <hr>
 
-                    
-                    <div class="row">
+                     <!-- Các địa điểm đã đi -->
+                     <div class="row mb-2">
+                        <div class="col-sm-3">
+
+                            <!-- Button trigger modal -->
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-info waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#travel_checked">
+                                Các địa điểm đã tới
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="travel_checked" tabindex="-1" aria-labelledby="editUserModalLabel" style="display: none;" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editUserModalLabel">
+                                                <i class="fas fa-user-edit"></i> Các địa điểm bạn đã tới
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <section>
+                                            <?php 
+                                                
+                                                $user_id = $_SESSION['id'];
+                                                $pg_region = "select gadm40_vnm_1.name_1, count(travel_id),gadm40_vnm_1.gid  from travel_location trv, check_in ci, gadm40_vnm_1 where ci.travel_id = trv.id and ci.user_id = $user_id 
+                                                and ST_Within(trv.geom, gadm40_vnm_1.geom) = true group by gadm40_vnm_1.name_1,gadm40_vnm_1.gid";
+                                                $regions = pg_query($conn, $pg_region);
+                                                while($row = pg_fetch_assoc($regions))
+                                                {?>
+                                                    <p>
+                                                        <span class="btn" style="font-weight:bold;" data-bs-toggle="collapse" href="#collapseExample<?php echo $row['gid']?>" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                            <?php echo $row['name_1']; ?>
+                                                        </span> 
+                                                    </p>
+                                                
+                                                
+                                                   
+                                            
+                                                <div class="collapse" id="collapseExample<?php echo $row['gid']?>">
+                                                    <div class="card card-body">
+                                                        <ul>
+                                                        <?php
+                                                    $region_name = $row['name_1'];
+                                                    $pg_travel = "select trv.name,gadm40_vnm_1.name_1  from travel_location trv, check_in ci, gadm40_vnm_1 where ci.travel_id = trv.id and ci.user_id = 2 
+                                                    and ST_Within(trv.geom, gadm40_vnm_1.geom) = true and gadm40_vnm_1.name_1 = '$region_name'";
+                                                    $travels = pg_query($conn, $pg_travel);
+                                                    while($travel = pg_fetch_assoc($travels))
+                                                    { ?>
+                                                        <li><?php echo $travel['name'];  ?></li>
+                                                        
+                                                <?php
+                                                    }
+                                                ?>
+                                                            
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <?php }
+                                                
+                                                ?>
+                                            </section>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary waves-effect waves-light" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- end các địa điểm -->
+                    <hr>
+                    <div class="row mt-2 ">
                         <div class="col-sm-3">
                             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 Đổi mật khẩu
@@ -256,6 +329,8 @@ if (($id == $_SESSION['id'])) {
                             </div>
                         </div>
                     </div>
+
+                   
                 </div>
             </div>
 
