@@ -345,10 +345,8 @@ if (!$_SESSION['email']) {
                                 $('.toast-wrapper').removeClass('d-none')
                                 $('.toast-body').html("Bạn đã check in ở đây rồi!");
                                 $('.toast').toast('show');
-                                $('.btn-checkin').attr('disabled','disabled');
                             } else{
                                 $('.toast-wrapper').removeClass('d-none')
-                                $('.btn-checkin').removeAttr("disabled")
                                 $('.checkIn').html(result);
                                 $('.toast').toast('show')
                                 $('.toast-body').html("Bạn đã check in thành công");
